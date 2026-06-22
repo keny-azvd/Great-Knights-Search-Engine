@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GK'SE</title>
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg: #111;
+            --surface: #191919;
+            --border: #272727;
+            --text: #d4d4d4;
+            --text2: #707070;
+            --accent: #c0c0c0;
+            --hover: #222;
+        }
+
+        body {
+            font-family: -apple-system, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+        }
+
+        a { color: inherit; text-decoration: none; }
+
+        .layout {
+            max-width: 640px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        /* -- Header -- */
+        .header {
+            padding: 48px 0 40px;
+            transition: padding 0.3s;
+        }
+        body.compact .header { padding: 24px 0 20px; }
+
+        .logo {
+            font-size: 15px;
+            font-weight: 600;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: var(--text2);
+        }
+
+        /* -- Search -- */
+        .search {
+            position: relative;
+        }
+
+        .search input {
+            width: 100%;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text);
+            font-size: 15px;
+            padding: 13px 16px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .search input:focus { border-color: #444; }
+        .search input::placeholder { color: var(--text2); }
+
+        /* -- Meta -- */
+        .meta {
+            padding: 20px 0 8px;
+            font-size: 12px;
+            color: var(--text2);
+            display: none;
+        }
+        .meta span + span::before { content: '·'; margin: 0 8px; }
+        body.compact .meta { display: block; }
+
+        /* -- Results -- */
+        .results { padding-bottom: 80px; }
+
+        .item {
+            padding: 14px 0;
+            border-bottom: 1px solid var(--border);
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+        .item:first-child { border-top: 1px solid var(--border); }
+        .item:hover { background: var(--hover); margin: 0 -24px; padding: 14px 24px; }
+
+        .item-title {
+            font-size: 14px;
+            font-weight: 400;
+            line-height: 1.5;
+        }
+
+        .item-sub {
+            font-size: 11px;
+            color: var(--text2);
+            margin-top: 2px;
+        }
+
+        /* -- Suggestions -- */
+        .suggestions {
+            padding: 24px 0;
+        }
+        .suggestions p {
+            font-size: 12px;
+            color: var(--text2);
+            margin-bottom: 10px;
+        }
+        .chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+        .chip {
+            font-size: 13px;
+            color: var(--text);
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 6px 12px;
+            cursor: pointer;
+            transition: border-color 0.15s;
+        }
+        .chip:hover { border-color: #444; }
+        .chip small { color: var(--text2); margin-left: 4px; }
+
+        /* -- Empty -- */
+        .empty {
+            padding: 48px 0;
+            text-align: center;
+            font-size: 13px;
+            color: var(--text2);
+        }
+
+        /* -- Overlay -- */
+        .overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.6);
+            display: none;
+            z-index: 10;
+        }
+        .overlay.open { display: block; }
+
+        .panel {
+            position: fixed;
+            top: 0; right: 0; bottom: 0;
+            width: min(560px, 100%);
+            background: var(--bg);
+            border-left: 1px solid var(--border);
+            z-index: 11;
+            display: none;
+            flex-direction: column;
+        }
+        .panel.open { display: flex; }
+
+        .panel-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--border);
+        }
+        .panel-head h2 {
+            font-size: 14px;
+            font-weight: 500;
+            flex: 1;
+            margin-right: 16px;
+            line-height: 1.4;
+        }
+        .close-btn {
+            background: none;
+            border: none;
+            color: var(--text2);
+            font-size: 20px;
+            cursor: pointer;
+            padding: 0 4px;
+        }
+
+        .panel-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 24px;
+            font-size: 14px;
+            line-height: 1.8;
+            color: var(--text);
+            white-space: pre-wrap;
+        }
+
+        .loading {
+            color: var(--text2);
+            font-size: 13px;
+            padding: 24px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="layout">
+        <div class="header">
+            <div class="logo">gk'se</div>
+        </div>
+        <div class="search">
+            <input id="q" type="text" placeholder="Buscar..." autofocus>
+        </div>
+        <div class="meta" id="meta"></div>
+        <div class="results" id="results"></div>
+    </div>
+
+    <div class="overlay" id="overlay"></div>
+    <div class="panel" id="panel">
+        <div class="panel-head">
+            <h2 id="panelTitle"></h2>
+            <button class="close-btn" id="closePanel">&times;</button>
+        </div>
+        <div class="panel-body" id="panelBody"></div>
+    </div>
+
+    <script>
+        const q = document.getElementById('q');
+        const meta = document.getElementById('meta');
+        const results = document.getElementById('results');
+        const overlay = document.getElementById('overlay');
+        const panel = document.getElementById('panel');
+        const panelTitle = document.getElementById('panelTitle');
+        const panelBody = document.getElementById('panelBody');
+
+        let busy = false;
+
+        q.addEventListener('keydown', e => {
+            if (e.key === 'Enter' && q.value.trim()) search(q.value.trim());
+        });
+
+        function search(term) {
+            if (busy) return;
+            busy = true;
+            q.value = term;
+            document.body.classList.add('compact');
+            results.innerHTML = '<div class="loading">Buscando...</div>';
+            meta.style.display = 'none';
+
+            fetch('/api/search?q=' + encodeURIComponent(term))
+                .then(r => r.json())
+                .then(render)
+                .catch(() => { results.innerHTML = '<div class="empty">Erro de conexão</div>'; })
+                .finally(() => { busy = false; });
+        }
+
+        function render(data) {
+            let h = '';
+
+            if (data.results && data.results.length) {
+                meta.innerHTML = `<span>${data.total.toLocaleString()} resultados</span><span>${data.time_ms.toFixed(2)} ms</span>`;
+                meta.style.display = 'block';
+
+                data.results.forEach((r, i) => {
+                    h += `<div class="item" onclick="openDoc(${r.id},'${esc(r.title)}')">
+                        <div class="item-title">${text(r.title)}</div>
+                        <div class="item-sub">${r.freq} ocorrências</div>
+                    </div>`;
+                });
+
+                if (data.total > data.results.length) {
+                    h += `<div class="empty">${data.results.length} de ${data.total.toLocaleString()} exibidos</div>`;
+                }
+            }
+
+            if (data.suggestions && data.suggestions.length) {
+                meta.innerHTML = `<span>0 resultados</span><span>${data.time_ms.toFixed(2)} ms</span>`;
+                meta.style.display = 'block';
+
+                h += '<div class="suggestions"><p>Você quis dizer</p><div class="chips">';
+                data.suggestions.forEach(s => {
+                    h += `<div class="chip" onclick="search('${esc(s.word)}')">${text(s.word)}<small>${s.count}</small></div>`;
+                });
+                h += '</div></div>';
+            }
+
+            if (!h) {
+                meta.innerHTML = `<span>0 resultados</span>`;
+                meta.style.display = 'block';
+                h = '<div class="empty">Sem resultados</div>';
+            }
+
+            results.innerHTML = h;
+        }
+
+        function openDoc(id, title) {
+            panelTitle.textContent = title;
+            panelBody.textContent = 'Carregando...';
+            overlay.classList.add('open');
+            panel.classList.add('open');
+
+            fetch('/api/document?id=' + id)
+                .then(r => r.json())
+                .then(d => { panelBody.textContent = d.error || d.text; })
+                .catch(() => { panelBody.textContent = 'Erro ao carregar.'; });
+        }
+
+        function closePanel() {
+            overlay.classList.remove('open');
+            panel.classList.remove('open');
+        }
+
+        document.getElementById('closePanel').addEventListener('click', closePanel);
+        overlay.addEventListener('click', closePanel);
+        document.addEventListener('keydown', e => { if (e.key === 'Escape') closePanel(); });
+
+        function text(s) { const d = document.createElement('div'); d.textContent = s || ''; return d.innerHTML; }
+        function esc(s) { return (s||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'"); }
+    </script>
+</body>
+</html>

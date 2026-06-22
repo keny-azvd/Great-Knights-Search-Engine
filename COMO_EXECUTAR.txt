@@ -1,0 +1,150 @@
+================================================================================
+          GK'SE - Great Knights' Search Engine - GUIA DE EXECUCAO
+================================================================================
+
+Projeto de Search Engine desenvolvido para o curso de Estruturas de Dados e
+Algoritmos da FGV. Utiliza uma arvore Trie para indexar e buscar palavras
+no corpus WikiCorpus (ingles).
+
+================================================================================
+                          PRE-REQUISITOS
+================================================================================
+
+1. COMPILADOR C++
+   - g++ (GCC) instalado no sistema
+   - Verificar com: g++ --version
+
+2. BIBLIOTECAS C++ (padrao, nao requerem instalacao extra):
+   - string.h, vector, iostream, fstream, sstream
+   - chrono, algorithm, exception, thread
+
+3. PARA A INTERFACE WEB (opcional):
+   - Biblioteca Boost C++ instalada
+     (pacotes: boost_filesystem, boost_thread, pthread, boost_system)
+   - No Ubuntu/Debian: sudo apt install libboost-all-dev
+
+4. PYTHON 3.7+ (apenas se quiser reprocessar os dados do zero)
+
+5. DADOS PRE-PROCESSADOS (OBRIGATORIO):
+   Baixe o zip do link abaixo e extraia na pasta raiz do projeto:
+   https://drive.google.com/file/d/1C1REE2hm8JPc5KaK1YxJmO_M29VrZB8-/view
+
+   Apos a extracao, devem aparecer na raiz do projeto:
+   - trieSerial       (arquivo da arvore serializada, ~centenas de MB)
+   - aNames/          (pasta com arquivos de titulos dos artigos)
+   - aTexts/          (pasta com os textos dos artigos)
+
+================================================================================
+              PASSO A PASSO - MODO TERMINAL (engine.cpp)
+================================================================================
+
+PASSO 1: Baixar os dados
+   - Acesse o link do Google Drive acima
+   - Baixe e extraia o conteudo na pasta raiz do projeto
+   - Confirme que os arquivos/pastas trieSerial, aNames/ e aTexts/ existem
+
+PASSO 2: Compilar o engine
+   Abra um terminal na pasta raiz do projeto e execute:
+
+      g++ engine.cpp -o engine
+
+PASSO 3: Executar o engine
+   No mesmo terminal, execute:
+
+      ./engine
+
+   - O programa levara de 2 a 4 minutos para desserializar a arvore Trie
+   - Aguarde a mensagem "Deserialization finished"
+
+PASSO 4: Realizar buscas
+   - Digite sua consulta (uma ou mais palavras) e pressione Enter
+   - O programa exibira os resultados encontrados, ordenados por frequencia
+   - Os resultados sao exibidos em blocos de 20
+
+PASSO 5: Interagir com os resultados
+   - Digite o numero do resultado para abrir o texto completo do artigo
+   - Digite "n" para nao abrir nenhum
+   - Digite "y" para ver mais resultados (quando disponiveis)
+
+PASSO 6: Sugestoes de palavras
+   - Se a palavra buscada nao for encontrada, o sistema sugere palavras
+     similares usando distancia de Levenshtein
+   - Voce pode selecionar uma sugestao digitando seu numero
+
+PASSO 7: Sair do programa
+   - Digite "0" como consulta para encerrar o programa
+
+================================================================================
+          PASSO A PASSO - MODO WEB (servidor HTTP - opcional)
+================================================================================
+
+PASSO 1: Instalar a biblioteca Boost
+   No Ubuntu/Debian:
+      sudo apt install libboost-all-dev
+
+PASSO 2: Compilar o servidor
+   Entre na pasta Search_engine-servidor/ e execute:
+
+      g++ servidor.cpp -I /usr/include -lboost_filesystem -lboost_thread -lpthread -lboost_system -o servidor
+
+PASSO 3: Garantir que os dados estejam acessiveis
+   - O arquivo trieSerial deve estar na pasta Search_engine-servidor/
+   - A pasta aNames/ deve estar acessivel a partir de ./../aNames/
+     (ou seja, na pasta raiz do projeto)
+
+PASSO 4: Executar o servidor
+      ./servidor
+
+   - Aguarde a desserializacao e a mensagem de que o servidor esta pronto
+
+PASSO 5: Acessar a interface web
+   Abra um navegador e acesse:
+      http://localhost:8080/index.html
+
+   - Digite sua busca no campo de texto e clique "Send"
+   - Os resultados aparecerao na pagina
+
+================================================================================
+        PASSO A PASSO - PROCESSAMENTO DOS DADOS (opcional, avancado)
+================================================================================
+
+Este passo so e necessario se voce quiser reprocessar os dados brutos do zero.
+Requer ~16GB de RAM.
+
+PASSO 1: Baixar o corpus WikiCorpus
+   Baixe de: https://www.cs.upc.edu/~nlp/wikicorpus/raw.en.tgz
+   Extraia a pasta raw.en/ dentro de DataTreatment/
+
+PASSO 2: Extrair palavras unicas
+   Na pasta DataTreatment/, execute:
+      python3 get_words.py
+   Isso gera as pastas words/ e sorted_words/
+
+PASSO 3: Extrair titulos
+   Na pasta DataTreatment/aTales/, execute:
+      python3 aMaker.py
+   Isso gera a pasta aNames/
+
+PASSO 4: Extrair textos
+   Na pasta DataTreatment/aTales/, execute:
+      python3 aTaker.py
+   Isso gera a pasta aTexts/
+
+PASSO 5: Serializar a arvore
+   Na pasta Serialization/, com sorted_words/ disponivel, compile e execute:
+      g++ trieSerial.cpp -o trieSerial_builder
+      ./trieSerial_builder
+   Isso gera o arquivo trieSerial (processo custoso em RAM)
+
+PASSO 6: Mover os arquivos gerados
+   Copie trieSerial, aNames/ e aTexts/ para a pasta raiz do projeto
+
+================================================================================
+                         RESUMO RAPIDO
+================================================================================
+
+   cd Project_GKSearchEngine
+   # (apos baixar e extrair os dados do Google Drive)
+   g++ engine.cpp -o engine && ./engine
+
+================================================================================

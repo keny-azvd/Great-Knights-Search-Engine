@@ -1,0 +1,27 @@
+<header>
+	<title>Servidor C++</title> 
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+
+</header>
+
+<body>
+<center>Search engine GK'SE
+<p>What is your research?</p></center>
+<center>
+<form onsubmit="return false;" method="get">
+<input id = "name" type = "text" placeholder ="your research" autofocus>
+<input id = "btn" type = "button" onclick="query()" value ="Send">
+</form>
+</center>
+
+<a href="https://www.mozilla.org/en-US/"><div id ="output"></div></a>
+
+
+
+<div id = "image"></div>
+
+<script src = "script.js"></script>
+</body>
+
+
+

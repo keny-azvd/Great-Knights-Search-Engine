@@ -1,0 +1,22 @@
+# Compiled binaries
+engine
+engine_server
+*.out
+*.o
+*.exe
+
+# Serialized trie (~2.4GB)
+trieSerial
+
+# Corpus data (too large for git)
+raw.en/
+aTexts/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
