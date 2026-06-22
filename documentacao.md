@@ -452,10 +452,3 @@ g++ servidor.cpp -I /usr/include \
 | **dbindex** | Identificador único de cada documento/artigo no corpus |
 | **Pair** | Classe que armazena o par (id_documento, frequência) |
 | **inter2sorted** | Função de interseção de dois vetores ordenados |
-
-# Créditos
-
-- **Serialização/Desserialização**: Jorge Costa
-- **Biblioteca Simple-Web-Server**: Ole Christian Eidheim
-- **Corpus WikiCorpus**: NLP Group, UPC Barcelona
-- **Referências para Levenshtein na Trie**: Steve Hanov, Murilo Adriano
