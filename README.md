@@ -70,7 +70,3 @@ The web interface shows search results as a flat list. Click any result to read 
 | Single word lookup | O(k), k = word length |
 | Multi-word intersection | O(n + m), n/m = result set sizes |
 | Levenshtein suggestions | O(N * k * w), N = Trie nodes visited |
-
-## Authors
-
-Developed by Kenner Azevedo, Jorge Costa and Rener Oliveira.
